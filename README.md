@@ -1,39 +1,42 @@
-# example-api-client
+# hailey-api-client
 
-**ExampleApiClient** is a third party [Example API](https://example.com/docs/) client for NodeJS. It is a wrapper around an API client that has been [automatically generated](https://www.npmjs.com/package/swagger-typescript-api) using the [OpenAPI schema](https://example.com/openapi.json) provided by Example.
+**HaileyApiClient** is a third party [Hailey API](https://api.haileyhr.app/docs/) client for NodeJS. It is a wrapper around an API client that has been [automatically generated](https://www.npmjs.com/package/swagger-typescript-api) using the [OpenAPI schema](https://api.haileyhr.app/docs/v1/docs.json) provided by Hailey.
 
 ## Installation
 
 Add to project's package.json:
 
 ```
-npm install @rantalainen/example-api-client
+npm install @rantalainen/hailey-api-client
 ```
 
 ### Import
 
 ```javascript
-import { ExampleApiClient } from '@rantalainen/example-api-client';
+import { HaileyApiClient } from '@rantalainen/hailey-api-client';
 ```
 
 ## Setup client with options
 
-In order to obtain an API key, please contact Example Support. An API key is needed to access all API functions.
+In order to obtain an API key, please contact Hailey Support. An API key is needed to access all API functions.
 
 ```javascript
-const example = new ExampleApiClient(
+const hailey = new HaileyApiClient(
   {
-    apiKey: 'api_key'
+    accessToken: 'accessToken'
   },
   {
-    baseURL: 'https://dev.example.com'
+    baseURL: 'https://api.demo.haileyhr.app/'
   }
 );
+
+const response = await hailey.api.employees.employeesList();
 ```
 
-Available methods can be found in the [API documentation](https://example.com/docs/).
+Available methods can be found in the [API documentation](https://api.haileyhr.app/docs/).
 
 ## Resources
 
-- Example: https://example.com/
-- Example Developer Guide: https://example.com/docs/
+- Hailey HR: https://haileyhr.com/
+- Hailey HR API Guide: https://docs.haileyhr.com/
+- Hailey HR Integration Docs: https://docs.haileyhr.com/integrations/
