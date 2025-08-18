@@ -1,5 +1,6 @@
 /* eslint-disable */
 /* tslint:disable */
+// @ts-nocheck
 /*
  * ---------------------------------------------------------------
  * ## THIS FILE WAS GENERATED VIA SWAGGER-TYPESCRIPT-API        ##
@@ -36,21 +37,54 @@ export interface BankDetails {
   swift?: string | null;
 }
 
-export interface ChangeItem {
-  /** @format uuid */
-  employeeId?: string;
-  changeDate?: string | null;
-  /** @format date */
-  effectiveDate?: string;
-  field?: string | null;
-  oldValue?: any;
-  newValue?: any;
-  isCustomField?: boolean;
-  customFieldType?: string | null;
+/** A BusinessArea created by the company. */
+export interface BusinessArea {
+  /**
+   * The unique id of the BusinessArea in Hailey HR.
+   * @format uuid
+   */
+  id?: string;
+  /** The name of the BusinessArea. */
+  name?: string | null;
 }
 
-export interface ChangeReportItem {
-  changes?: ChangeItem[] | null;
+export interface CasualEmploymentVm {
+  /**
+   * The unique Id of the Casual Employment in Hailey HR.
+   * @format uuid
+   */
+  employmentId?: string;
+  /**
+   * The start date of the Casual Employment in YYYY-MM-DD format.
+   * @format date
+   */
+  startDate?: string;
+  /**
+   * The end date of the Casual Employment in YYYY-MM-DD format.
+   * @format date
+   */
+  endDate?: string | null;
+  organizationalInformation?: EmploymentOrganizationalInformation;
+  /** Custom fields defined for a Company, with the data set for the Employment. */
+  customFieldsData?: Record<string, JToken>;
+  /** List of contracted periods within the Casual Employment. A contracted period is a period with contracted commitment of work with specific terms at a period that must be within the casual employment. */
+  contractedPeriods?: ContractedPeriodVm[] | null;
+  /** The Employment sequence number for the employment, auto generated or manually set. Multiple employments may have the same Employment sequence number. Note that this differs from the Employment number for the Employee. */
+  employmentSequenceNumber?: string | null;
+  /** The status of the employment. Can be WillStart, Active or Ended. */
+  status?: string | null;
+}
+
+export interface Certificate {
+  /** @format uuid */
+  certificationId?: string;
+  /** @format uuid */
+  certificateId?: string;
+  /** @format uuid */
+  employeeId?: string;
+  issueDate?: string | null;
+  expirationDate?: string | null;
+  isVerified?: boolean;
 }
 
 export interface ClockInRequestModel {
@@ -79,6 +113,51 @@ export interface Company {
   legalEntities?: LegalEntity[] | null;
   /** The Company's departments. */
   departments?: Department[] | null;
+  /** The Company's Business Areas, if any. */
+  businessAreas?: BusinessArea[] | null;
+  /** The Company's Cost Centers, if any. */
+  costCenters?: CostCenter[] | null;
+}
+
+/** A certification created by the company. */
+export interface CompanyCertification {
+  /**
+   * The unique id for the certification in Hailey HR.
+   * @format uuid
+   */
+  id?: string;
+  /** The name of the certification. */
+  name?: string | null;
+  /** The description of the certification. */
+  description?: string | null;
+  /** List of title ids that the certification is required for. */
+  titles?: string[] | null;
+  /** List of team ids that the certification is required for. */
+  teams?: string[] | null;
+}
+
+/** An education created by the company. */
+export interface CompanyEducation {
+  /**
+   * The unique id for the education in Hailey HR.
+   * @format uuid
+   */
+  educationId?: string;
+  /** The title of the education. */
+  title?: string | null;
+  /** The description of the education. */
+  description?: string | null;
+}
+
+/** A salary type created by the company. */
+export interface CompanySalaryType {
+  /**
+   * The unique id for the salary type in Hailey HR.
+   * @format uuid
+   */
+  salaryTypeId?: string;
+  /** The name of the salary type. */
+  name?: string | null;
 }
 
 /** A Team created by the company. */
@@ -112,6 +191,56 @@ export interface ContactInformation {
   city?: string | null;
   /** The Employee's country. */
   country?: string | null;
+}
+
+export interface ContractedPeriodVm {
+  /**
+   * Start date of the contracted period within the casual employment.
+   * @format date
+   */
+  startDate?: string;
+  /**
+   * End date of the contracted period within the casual employment.
+   * @format date
+   */
+  endDate?: string;
+  /** Type of contracted period, e.g. Temporary substitute. */
+  contractedPeriodType?: string | null;
+  /**
+   * EmployeeId of the substituted employee if contracted period type is Temporary substitute.
+   * @format uuid
+   */
+  substitutingForEmployeeId?: string | null;
+  /**
+   * Unique id of contracted period.
+   * @format uuid
+   */
+  contractedPeriodId?: string;
+  /** Bool indicating if the contract for the contracted period is signed by required parties. */
+  isSigned?: boolean;
+  /**
+   * Id of the salary relevant for this contracted period.
+   * @format uuid
+   */
+  salaryId?: string;
+  /**
+   * Id of the reason for substitution if the contracted period type is Temporary substitute.
+   * @format uuid
+   */
+  substituteReasonId?: string | null;
+}
+
+/** A CostCenter created by the company. */
+export interface CostCenter {
+  /**
+   * The unique id of the CostCenter in Hailey HR.
+   * @format uuid
+   */
+  id?: string;
+  /** The name of the CostCenter. */
+  name?: string | null;
+  /** The code of the CostCenter. */
+  code?: string | null;
 }
 
 export type CurrencyCode = object;
@@ -161,6 +290,53 @@ export interface Department {
   name?: string | null;
 }
 
+/** Represents a request to register an education session in Hailey HR. */
+export interface EducationSessionRequestModel {
+  /**
+   * Required: The unique id for the education in Hailey HR.
+   * @format uuid
+   */
+  educationId?: string;
+  /**
+   * The date of the education session.
+   * @format date
+   */
+  date?: string;
+  /** A list of employeeIds of the participating employees. */
+  participants?: string[] | null;
+  /**
+   * The total length of the education session in minutes.
+   * @format int32
+   */
+  totalDurationInMinutes?: number | null;
+}
+
+/** A session of a specific education */
+export interface EducationSessionVm {
+  /**
+   * The id of the specific education defined within the company
+   * @format uuid
+   */
+  educationId?: string;
+  /**
+   * The id of this specific session
+   * @format uuid
+   */
+  sessionId?: string;
+  /**
+   * The date of this session
+   * @format date
+   */
+  date?: string;
+  /** The employeeIds of the session participants */
+  employeeIds?: string[] | null;
+  /**
+   * the duration of the session in minutes
+   * @format int32
+   */
+  durationInMinutes?: number | null;
+}
+
 /** Base model for a single Employee. */
 export interface Employee {
   /**
@@ -170,7 +346,7 @@ export interface Employee {
   employeeId?: string;
   /** Indicates if the Employee has an account and can log in to Hailey HR. */
   accountStatus?: string | null;
-  /** ReportedTimeDayStatus of the Employee's Employment, e.g. "In service" or "Will join". */
+  /** The employee's Employment Status. Can be "BeingHired", "WillJoin", "InService" "Leaving" or "HasLeft". */
   employmentStatus?: string | null;
   /**
    * Date time of the last change to this object.
@@ -235,6 +411,11 @@ export interface EmployeeListItem {
    */
   businessAreaId?: string | null;
   /**
+   * Id of the Cost Center the Employee belongs to in this Employment.
+   * @format uuid
+   */
+  costCenterId?: string | null;
+  /**
    * Id of the Employee the current Employee reports to, if any.
    * @format uuid
    */
@@ -251,6 +432,11 @@ export interface EmployeeListItem {
    * @format date
    */
   lastDayOfEmployment?: string | null;
+  /**
+   * The last day an employee is expected to work but not necessarily the same date as last day of employment.
+   * @format date
+   */
+  lastWorkingDay?: string | null;
   /**
    * ReportedTimeDayStatus of the Employee's employment, e.g. "In service" or "Will join". This property is calculated
    * from the start and end dates of the employee's employments, and may thus change when days pass.
@@ -299,10 +485,15 @@ export interface EmployeeListItem {
    */
   vacationDays?: number | null;
   /**
-   * Id of the Employee the current Employee is substituting for, if any. Calculated from the employee's effectual employment.
+   * ID of the Employee the current Employee is substituting for, if any. Calculated from the employee's effectual employment.
    * @format uuid
    */
   substitutingForEmployeeId?: string | null;
+  /**
+   * ID of the substitute reason. Can be a reason defined for the company, or null if none was selected.
+   * @format uuid
+   */
+  sustituteReasonId?: string | null;
   /** The employment number for the employee, auto generated or manually set. */
   employmentNumber?: string | null;
   /** The Employee's bank name. */
@@ -365,17 +556,19 @@ export interface EmployeeWithTimeOffs {
 /** Information concerning the Employment of the Employee. */
 export interface Employment {
   /**
-   * The date the Employee joined the Company.
+   * The date the Employee joined the Company, calculated from the start date(s) och the employments.
    * @format date
    */
   dateOfJoining?: string | null;
   /**
-   * The date the Employment ends for the Employee, if any.
+   * The date the Employment ends for the Employee, if any, calculated from the end date(s) och the employments.
    * @format date
    */
   lastDayOfEmployment?: string | null;
-  /** The Employments of the employee. current, future and historical. */
+  /** A list of all Employments for the employee. Includes current, past and future Employments. */
   employments?: EmploymentVm[] | null;
+  /** A list of all Casual Employments for the employee. Includes current, past and future Casual Employments. Note that Casual employments has a different business logic from Employments, for details see our knowledge base. */
+  casualEmployments?: CasualEmploymentVm[] | null;
 }
 
 export interface EmploymentOrganizationalInformation {
@@ -408,6 +601,11 @@ export interface EmploymentOrganizationalInformation {
    * @format uuid
    */
   businessAreaId?: string | null;
+  /**
+   * Id of the Cost Center the Employee belongs to in this Employment.
+   * @format uuid
+   */
+  costCenterId?: string | null;
 }
 
 export interface EmploymentTerms {
@@ -458,6 +656,11 @@ export interface EmploymentTerms {
    * @format uuid
    */
   substitutingForEmployeeId?: string | null;
+  /**
+   * ID of the substitute reason. Can be a reason defined for the company, or null if none was selected.
+   * @format uuid
+   */
+  substituteReasonId?: string | null;
 }
 
 export interface EmploymentVm {
@@ -467,19 +670,33 @@ export interface EmploymentVm {
    */
   employmentId?: string;
   /**
-   * The start date of the Employment in YYYY-MM-DD format
+   * A number representing the order of priority for this Employment among all Employments. This is e.g. useful for determining which Employment that should take priority when two employments have start and end date intervals that overlap. Highest priority is nr 1.
+   * @format int32
+   */
+  priority?: number;
+  /**
+   * The start date of the Employment in YYYY-MM-DD format.
    * @format date
    */
   startDate?: string;
   /**
-   * The end date of the Employment in YYYY-MM-DD format
+   * The end date of the Employment in YYYY-MM-DD format.
    * @format date
    */
   endDate?: string | null;
+  /**
+   * The last working day of this employment, not necessarily the same date as last day of employment.
+   * @format date
+   */
+  lastWorkingDay?: string | null;
   organizationalInformation?: EmploymentOrganizationalInformation;
   terms?: EmploymentTerms;
   /** Custom fields defined for a Company, with the data set for the Employment. */
   customFieldsData?: Record<string, JToken>;
+  /** The Employment sequence number for the employment, auto generated or manually set. Multiple employments may have the same Employment sequence number. Note that this differs from the Employment number for the Employee. */
+  employmentSequenceNumber?: string | null;
+  /** The status of the employment. Can be "WillStart", "Active" or "Ended". */
+  status?: string | null;
 }
 
 /** A feedback for the Employee. */
@@ -593,7 +810,12 @@ export interface ImportTimeOffDate {
   date?: string;
   /** @format uuid */
   timeOffReasonId?: string;
-  /** @format double */
+  /**
+   * A double ranging from 0 to 1, where 1 represents a scope of 100%
+   * @format double
+   * @min 0
+   * @max 1
+   */
   scope?: number | null;
   /** @format int32 */
   minutes?: number | null;
@@ -649,6 +871,8 @@ export interface JobAd {
   showDepartment?: boolean;
   /** The Job ad's custom input fields, if any. */
   customInputFields?: CustomInputField[] | null;
+  /** A link to the published Job ad on the Career Page, if any. */
+  linkToJobAdOnCareerPage?: string | null;
 }
 
 /** Job related data for the Employee. */
@@ -701,6 +925,16 @@ export interface Location {
   id?: string;
   /** The name of the Location. */
   name?: string | null;
+  /** The address/street of the Location. */
+  address?: string | null;
+  /** The city of the Location. */
+  city?: string | null;
+  /** The postal code of the Location. */
+  postalCode?: string | null;
+  /** The country of the Location. */
+  country?: string | null;
+  /** The phone number of the Location. */
+  phone?: string | null;
 }
 
 /** Personal data for the Employee. */
@@ -937,11 +1171,19 @@ export interface UpdateCustomEmployeeFieldsRequestModel {
   customFieldsData?: Record<string, JToken>;
 }
 
-import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse, HeadersDefaults, ResponseType } from "axios";
+import type {
+  AxiosInstance,
+  AxiosRequestConfig,
+  AxiosResponse,
+  HeadersDefaults,
+  ResponseType,
+} from "axios";
+import axios from "axios";
 
 export type QueryParamsType = Record<string | number, any>;
 
-export interface FullRequestParams extends Omit<AxiosRequestConfig, "data" | "params" | "url" | "responseType"> {
+export interface FullRequestParams
+  extends Omit<AxiosRequestConfig, "data" | "params" | "url" | "responseType"> {
   /** set parameter to `true` for call `securityWorker` for this request */
   secure?: boolean;
   /** request path */
@@ -956,9 +1198,13 @@ export interface FullRequestParams extends Omit<AxiosRequestConfig, "data" | "pa
   body?: unknown;
 }
 
-export type RequestParams = Omit<FullRequestParams, "body" | "method" | "query" | "path">;
+export type RequestParams = Omit<
+  FullRequestParams,
+  "body" | "method" | "query" | "path"
+>;
 
-export interface ApiConfig<SecurityDataType = unknown> extends Omit<AxiosRequestConfig, "data" | "cancelToken"> {
+export interface ApiConfig<SecurityDataType = unknown>
+  extends Omit<AxiosRequestConfig, "data" | "cancelToken"> {
   securityWorker?: (
     securityData: SecurityDataType | null,
   ) => Promise<AxiosRequestConfig | void> | AxiosRequestConfig | void;
@@ -968,6 +1214,7 @@ export interface ApiConfig<SecurityDataType = unknown> extends Omit<AxiosRequest
 
 export enum ContentType {
   Json = "application/json",
+  JsonApi = "application/vnd.api+json",
   FormData = "multipart/form-data",
   UrlEncoded = "application/x-www-form-urlencoded",
   Text = "text/plain",
@@ -980,8 +1227,16 @@ export class HttpClient<SecurityDataType = unknown> {
   private secure?: boolean;
   private format?: ResponseType;
 
-  constructor({ securityWorker, secure, format, ...axiosConfig }: ApiConfig<SecurityDataType> = {}) {
-    this.instance = axios.create({ ...axiosConfig, baseURL: axiosConfig.baseURL || "" });
+  constructor({
+    securityWorker,
+    secure,
+    format,
+    ...axiosConfig
+  }: ApiConfig<SecurityDataType> = {}) {
+    this.instance = axios.create({
+      ...axiosConfig,
+      baseURL: axiosConfig.baseURL || "",
+    });
     this.secure = secure;
     this.format = format;
     this.securityWorker = securityWorker;
@@ -991,7 +1246,10 @@ export class HttpClient<SecurityDataType = unknown> {
     this.securityData = data;
   };
 
-  protected mergeRequestParams(params1: AxiosRequestConfig, params2?: AxiosRequestConfig): AxiosRequestConfig {
+  protected mergeRequestParams(
+    params1: AxiosRequestConfig,
+    params2?: AxiosRequestConfig,
+  ): AxiosRequestConfig {
     const method = params1.method || (params2 && params2.method);
 
     return {
@@ -999,7 +1257,11 @@ export class HttpClient<SecurityDataType = unknown> {
       ...params1,
       ...(params2 || {}),
       headers: {
-        ...((method && this.instance.defaults.headers[method.toLowerCase() as keyof HeadersDefaults]) || {}),
+        ...((method &&
+          this.instance.defaults.headers[
+            method.toLowerCase() as keyof HeadersDefaults
+          ]) ||
+          {}),
         ...(params1.headers || {}),
         ...((params2 && params2.headers) || {}),
       },
@@ -1015,13 +1277,20 @@ export class HttpClient<SecurityDataType = unknown> {
   }
 
   protected createFormData(input: Record<string, unknown>): FormData {
+    if (input instanceof FormData) {
+      return input;
+    }
     return Object.keys(input || {}).reduce((formData, key) => {
       const property = input[key];
-      const propertyContent: any[] = property instanceof Array ? property : [property];
+      const propertyContent: any[] =
+        property instanceof Array ? property : [property];
 
       for (const formItem of propertyContent) {
         const isFileType = formItem instanceof Blob || formItem instanceof File;
-        formData.append(key, isFileType ? formItem : this.stringifyFormItem(formItem));
+        formData.append(
+          key,
+          isFileType ? formItem : this.stringifyFormItem(formItem),
+        );
       }
 
       return formData;
@@ -1045,11 +1314,21 @@ export class HttpClient<SecurityDataType = unknown> {
     const requestParams = this.mergeRequestParams(params, secureParams);
     const responseFormat = format || this.format || undefined;
 
-    if (type === ContentType.FormData && body && body !== null && typeof body === "object") {
+    if (
+      type === ContentType.FormData &&
+      body &&
+      body !== null &&
+      typeof body === "object"
+    ) {
       body = this.createFormData(body as Record<string, unknown>);
     }
 
-    if (type === ContentType.Text && body && body !== null && typeof body !== "string") {
+    if (
+      type === ContentType.Text &&
+      body &&
+      body !== null &&
+      typeof body !== "string"
+    ) {
       body = JSON.stringify(body);
     }
 
@@ -1057,7 +1336,7 @@ export class HttpClient<SecurityDataType = unknown> {
       ...requestParams,
       headers: {
         ...(requestParams.headers || {}),
-        ...(type && type !== ContentType.FormData ? { "Content-Type": type } : {}),
+        ...(type ? { "Content-Type": type } : {}),
       },
       params: query,
       responseType: responseFormat,
@@ -1080,6 +1359,12 @@ export class HttpClient<SecurityDataType = unknown> {
  *
  * ### Company data
  * Here you can fetch basic information regarding your company, including name of e.g. departments, teams and custom fields.
+ *
+ * ### Company educations
+ * This endpoint retrieves all education records within your company.
+ *
+ * ### Company certifications
+ * This endpoint retrieves all certification records within your company.
  *
  * ### Quick add Employee
  * Use this endpoint to add a new employee with some basic employee information.
@@ -1111,6 +1396,12 @@ export class HttpClient<SecurityDataType = unknown> {
  * ### Job ad data
  * Use this endpoint to fetch all job ads for your company. "PublishDateTime" will indicate weather the job ad is published or not. It is required to have the rights to view and/or edit recruitments.
  *
+ * ### Educations session
+ * In this endpoint, you will find all educations sessions held and the employees that participated in each session in addition to when and for how long.
+ *
+ * ### Certificates
+ * In this endpoint, you will find a list of all certificates, including references to the holders, as well as the validity dates and status.
+ *
  * ## Webhooks
  * Companies have the option to configure webhooks in order to get notifications when data changes. Webhooks are sent when company data is modified or when a single employee is changed. The webhook URI is configured in the integrations section in Hailey.
  *
@@ -1118,33 +1409,25 @@ export class HttpClient<SecurityDataType = unknown> {
  *
  * <a href = "https://docs.haileyhr.com/guide-for-api">More info on the API</a>
  */
-export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDataType> {
-  changeReport = {
+export class Api<
+  SecurityDataType extends unknown,
+> extends HttpClient<SecurityDataType> {
+  certificates = {
     /**
      * No description
      *
-     * @tags ChangeReport
-     * @name ChangeReportList
-     * @summary Get a list of all changes in the company
-     * @request GET:/ChangeReport
+     * @tags Certificates
+     * @name CertificatesList
+     * @summary Get all certificates.
+     * @request GET:/Certificates
      * @secure
-     * @response `200` `(ChangeReportItem)[]` OK
-     * @response `201` `void` If changes are found
-     * @response `400` `void` If invalid period
+     * @response `200` `(Certificate)[]` If call is successfull
      * @response `401` `void` If unauthorized
      */
-    changeReportList: (
-      query?: {
-        changeDateOrEffectiveDate?: string;
-        fromDate?: string;
-        toDate?: string;
-      },
-      params: RequestParams = {},
-    ) =>
-      this.request<ChangeReportItem[], void>({
-        path: `/ChangeReport`,
+    certificatesList: (params: RequestParams = {}) =>
+      this.request<Certificate[], void>({
+        path: `/Certificates`,
         method: "GET",
-        query: query,
         secure: true,
         format: "json",
         ...params,
@@ -1218,6 +1501,115 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         format: "json",
         ...params,
       }),
+
+    /**
+     * No description
+     *
+     * @tags Company
+     * @name EducationsList
+     * @summary Get educations in your company.
+     * @request GET:/Company/Educations
+     * @secure
+     * @response `200` `(CompanyEducation)[]` If call is successful
+     * @response `401` `ProblemDetails` If unauthorized
+     * @response `404` `ProblemDetails` If resource is not found
+     */
+    educationsList: (params: RequestParams = {}) =>
+      this.request<CompanyEducation[], ProblemDetails>({
+        path: `/Company/Educations`,
+        method: "GET",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Company
+     * @name CertificationsList
+     * @summary Get all certifications in your company.
+     * @request GET:/Company/Certifications
+     * @secure
+     * @response `200` `(CompanyCertification)[]` If call is successful
+     * @response `401` `ProblemDetails` If unauthorized
+     * @response `404` `ProblemDetails` If resource is not found
+     */
+    certificationsList: (params: RequestParams = {}) =>
+      this.request<CompanyCertification[], ProblemDetails>({
+        path: `/Company/Certifications`,
+        method: "GET",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Company
+     * @name SalaryTypesList
+     * @summary Get salary types in your company.
+     * @request GET:/Company/SalaryTypes
+     * @secure
+     * @response `200` `(CompanySalaryType)[]` If call is successful
+     * @response `401` `ProblemDetails` If unauthorized
+     * @response `403` `ProblemDetails` If forbidden
+     */
+    salaryTypesList: (params: RequestParams = {}) =>
+      this.request<CompanySalaryType[], ProblemDetails>({
+        path: `/Company/SalaryTypes`,
+        method: "GET",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+  };
+  educationSessions = {
+    /**
+     * No description
+     *
+     * @tags EducationSessions
+     * @name EducationSessionsList
+     * @summary Get education sessions.
+     * @request GET:/EducationSessions
+     * @secure
+     * @response `200` `(EducationSessionVm)[]` If call is successful
+     * @response `401` `ProblemDetails` If unauthorized
+     * @response `404` `ProblemDetails` If resource is not found
+     */
+    educationSessionsList: (params: RequestParams = {}) =>
+      this.request<EducationSessionVm[], ProblemDetails>({
+        path: `/EducationSessions`,
+        method: "GET",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags EducationSessions
+     * @name EducationSessionsCreate
+     * @summary Add education session.
+     * @request POST:/EducationSessions
+     * @secure
+     * @response `200` `void` If call is successful
+     * @response `401` `ProblemDetails` If unauthorized
+     */
+    educationSessionsCreate: (
+      data: EducationSessionRequestModel,
+      params: RequestParams = {},
+    ) =>
+      this.request<void, ProblemDetails>({
+        path: `/EducationSessions`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        ...params,
+      }),
   };
   employee = {
     /**
@@ -1234,7 +1626,10 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @response `403` `void` If access denied
      * @response `default` `ProblemDetails` Error
      */
-    employeeCreate: (data: AddEmployeeRequestModel, params: RequestParams = {}) =>
+    employeeCreate: (
+      data: AddEmployeeRequestModel,
+      params: RequestParams = {},
+    ) =>
       this.request<void, ProblemDetails | void>({
         path: `/Employee`,
         method: "POST",
@@ -1290,7 +1685,11 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @response `404` `ProblemDetails` Not Found
      * @response `default` `ProblemDetails` Error
      */
-    companyEmailUpdate: (employeeId: string, data: UpdateCompanyEmailRequestModel, params: RequestParams = {}) =>
+    companyEmailUpdate: (
+      employeeId: string,
+      data: UpdateCompanyEmailRequestModel,
+      params: RequestParams = {},
+    ) =>
       this.request<void, ProblemDetails | void>({
         path: `/Employee/${employeeId}/CompanyEmail`,
         method: "PUT",
@@ -1310,11 +1709,11 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @request GET:/Employees
      * @secure
      * @response `200` `(EmployeeListItem)[]` If employees are found
-     * @response `401` `void` If unauthorized
+     * @response `401` `ProblemDetails` If unauthorized
      * @response `404` `ProblemDetails` If company or employees are not found
      */
     employeesList: (params: RequestParams = {}) =>
-      this.request<EmployeeListItem[], void | ProblemDetails>({
+      this.request<EmployeeListItem[], ProblemDetails>({
         path: `/Employees`,
         method: "GET",
         secure: true,
@@ -1356,7 +1755,10 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @response `400` `ProblemDetails` Bad Request
      * @response `default` `ProblemDetails` Error
      */
-    importTimeOffCreate: (data: ImportTimeOffRequestModel, params: RequestParams = {}) =>
+    importTimeOffCreate: (
+      data: ImportTimeOffRequestModel,
+      params: RequestParams = {},
+    ) =>
       this.request<void, ProblemDetails>({
         path: `/ImportTimeOff`,
         method: "POST",
@@ -1443,7 +1845,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @secure
      * @response `200` `Salary` If Salary is found
      * @response `401` `ProblemDetails` If unauthorized
-     * @response `404` `void` If salary is not found
+     * @response `404` `ProblemDetails` If salary is not found
      */
     salaryList: (
       query?: {
@@ -1452,7 +1854,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
       },
       params: RequestParams = {},
     ) =>
-      this.request<Salary, ProblemDetails | void>({
+      this.request<Salary, ProblemDetails>({
         path: `/Salary`,
         method: "GET",
         query: query,
