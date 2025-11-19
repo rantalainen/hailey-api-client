@@ -19,6 +19,20 @@ export interface AddEmployeeRequestModel {
   companyEmail: string;
   /** @format date */
   startDate: string;
+  /** @format uuid */
+  departmentId?: string | null;
+  /** @format uuid */
+  legalEntityId?: string | null;
+  /** @format uuid */
+  costCenterId?: string | null;
+  /** @format uuid */
+  businessAreaId?: string | null;
+  /** @format uuid */
+  locationId?: string | null;
+  /** @format uuid */
+  reportsToEmployeeId?: string | null;
+  teamIds?: string[] | null;
+  titleIds?: string[] | null;
 }
 
 /** Bank details for the Employee. */
@@ -46,6 +60,13 @@ export interface BusinessArea {
   id?: string;
   /** The name of the BusinessArea. */
   name?: string | null;
+  /**
+   * EmployeeId of the Head of the BusinessArea if there is one.
+   * @format uuid
+   */
+  headOfBusinessAreaEmployeeId?: string | null;
+  /** Departments belonging to this BusinessArea. */
+  departmentsInBusinessArea?: DepartmentInBusinessArea[] | null;
 }
 
 export interface CasualEmploymentVm {
@@ -243,6 +264,12 @@ export interface CostCenter {
   code?: string | null;
 }
 
+export interface CreateEducationRequestModel {
+  /** @minLength 1 */
+  educationName: string;
+  description?: string | null;
+}
+
 export type CurrencyCode = object;
 
 /** A Custom field for an Employment created by the company. */
@@ -288,6 +315,37 @@ export interface Department {
   id?: string;
   /** The name of the Department. */
   name?: string | null;
+  /**
+   * EmployeeId of the Head of the Department if there is one.
+   * @format uuid
+   */
+  headOfDepartmentEmployeeId?: string | null;
+  /**
+   * Belonging to department id if there is any, i.e. the department this department belongs to
+   * @format uuid
+   */
+  belongingToDepartmentId?: string | null;
+}
+
+/** Department In Business Area */
+export interface DepartmentInBusinessArea {
+  /**
+   * DepartmentId for the Department in the Business Area.
+   * @format uuid
+   */
+  departmentId?: string;
+  /**
+   * Head of department for the Department in the Business Area.
+   * @format uuid
+   */
+  headOfDepartmentInBusinessArea?: string | null;
+}
+
+export interface Education {
+  /** @format uuid */
+  educationId?: string;
+  title?: string | null;
+  description?: string | null;
 }
 
 /** Represents a request to register an education session in Hailey HR. */
@@ -363,6 +421,8 @@ export interface Employee {
   feedbackSessions?: FeedbackSession[] | null;
   /** The Feedback for the Employee, if any. */
   feedback?: Feedback[] | null;
+  /** The Three sixty reviews for the Employee, if any. */
+  threeSixtyReviews?: ThreeSixtyReview[] | null;
   /** The Salaries for the Employee, if any. */
   salaries?: Salary[] | null;
   organizationalBelonging?: EmploymentOrganizationalInformation;
@@ -481,7 +541,7 @@ export interface EmployeeListItem {
   scopeHours?: number | null;
   /**
    * Number of vacation days for the Employee. Calculated from the employee's effectual employment.
-   * @format int32
+   * @format double
    */
   vacationDays?: number | null;
   /**
@@ -648,7 +708,7 @@ export interface EmploymentTerms {
   scopeHours?: number | null;
   /**
    * Number of vacation days for the Employee.
-   * @format int32
+   * @format double
    */
   vacationDays?: number | null;
   /**
@@ -697,6 +757,11 @@ export interface EmploymentVm {
   employmentSequenceNumber?: string | null;
   /** The status of the employment. Can be "WillStart", "Active" or "Ended". */
   status?: string | null;
+}
+
+export interface EndBreakRequestModel {
+  /** @format uuid */
+  employeeId?: string;
 }
 
 /** A feedback for the Employee. */
@@ -1104,6 +1169,52 @@ export interface Sensitive {
   personalIdentityNumber?: string | null;
 }
 
+export interface StartBreakRequestModel {
+  /** @format uuid */
+  employeeId?: string;
+}
+
+/** A question and an answer for a three sixty review. */
+export interface ThreeSixtyQuestion {
+  answerBySelf?: string | null;
+  peerAnswers?: string[] | null;
+  answerByManager?: string | null;
+  reporteeAnswers?: string[] | null;
+  answerWhen?: string[] | null;
+  customOptionsForQuestion?: string[] | null;
+  typeOfAnswer?: string | null;
+  question?: string | null;
+  /** @format uuid */
+  questionId?: string | null;
+}
+
+/** A three sixty review for the Employee. */
+export interface ThreeSixtyReview {
+  /** @format uuid */
+  feedbackId?: string;
+  date?: string | null;
+  deadline?: string | null;
+  /** @format uuid */
+  hostEmployeeId?: string | null;
+  notes?: string | null;
+  sections?: ThreeSixtySection[] | null;
+  status?: string | null;
+  title?: string | null;
+  hasHostSignedOff?: boolean;
+  hasEmployeeSignedOff?: boolean;
+  hasAnswersFromSelf?: boolean;
+  hasAnswersFromPeer?: boolean;
+  hasAnswersFromManager?: boolean;
+  hasAnswersFromReportee?: boolean;
+}
+
+/** A group of questions with a title and an instruction for the host. */
+export interface ThreeSixtySection {
+  instructionsForHost?: string | null;
+  sectionTitle?: string | null;
+  questions?: ThreeSixtyQuestion[] | null;
+}
+
 /** The Time and Time off settings of the company */
 export interface TimeAndTimeOffSettings {
   timeOffReasons?: TimeOffReason[] | null;
@@ -1169,6 +1280,11 @@ export interface UpdateCompanyEmailRequestModel {
 
 export interface UpdateCustomEmployeeFieldsRequestModel {
   customFieldsData?: Record<string, JToken>;
+}
+
+export interface UpdateEducationRequestModel {
+  educationName?: string | null;
+  description?: string | null;
 }
 
 import type {
@@ -1393,8 +1509,17 @@ export class HttpClient<SecurityDataType = unknown> {
  * ### Clock Out
  * Use this endpoint to clock out a certain employee to end recording of worked time.
  *
+ * ### Start break
+ * Use this endpoint to start break for a certain employee who is clocked in.
+ *
+ * ### End break
+ * Use this endpoint to end break for a certain employee who is clocked in.
+ *
  * ### Job ad data
  * Use this endpoint to fetch all job ads for your company. "PublishDateTime" will indicate weather the job ad is published or not. It is required to have the rights to view and/or edit recruitments.
+ *
+ * ### Educations
+ * Handle educations for your company. Use GET to fetch all educations in your company.
  *
  * ### Educations session
  * In this endpoint, you will find all educations sessions held and the employees that participated in each session in addition to when and for how long.
@@ -1412,6 +1537,54 @@ export class HttpClient<SecurityDataType = unknown> {
 export class Api<
   SecurityDataType extends unknown,
 > extends HttpClient<SecurityDataType> {
+  break = {
+    /**
+     * No description
+     *
+     * @tags Break
+     * @name StartBreakCreate
+     * @summary Start break for employee who is clocked in. The time is shown in local time based on the time zone in company settings.
+     * @request POST:/Break/StartBreak
+     * @secure
+     * @response `200` `void` If start break is successful
+     * @response `400` `ProblemDetails` If bad request
+     * @response `401` `ProblemDetails` If unauthorized
+     */
+    startBreakCreate: (
+      data: StartBreakRequestModel,
+      params: RequestParams = {},
+    ) =>
+      this.request<void, ProblemDetails>({
+        path: `/Break/StartBreak`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Break
+     * @name EndBreakCreate
+     * @summary End break for employee who is clocked in. The time is shown in local time based on the time zone in company settings.
+     * @request POST:/Break/EndBreak
+     * @secure
+     * @response `200` `void` If end break is successful
+     * @response `400` `ProblemDetails` If bad request
+     * @response `401` `ProblemDetails` If unauthorized
+     */
+    endBreakCreate: (data: EndBreakRequestModel, params: RequestParams = {}) =>
+      this.request<void, ProblemDetails>({
+        path: `/Break/EndBreak`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        ...params,
+      }),
+  };
   certificates = {
     /**
      * No description
@@ -1507,8 +1680,9 @@ export class Api<
      *
      * @tags Company
      * @name EducationsList
-     * @summary Get educations in your company.
+     * @summary This endpoint has been deprecated and will be removed, use /Educations instead.
      * @request GET:/Company/Educations
+     * @deprecated
      * @secure
      * @response `200` `(CompanyEducation)[]` If call is successful
      * @response `401` `ProblemDetails` If unauthorized
@@ -1562,6 +1736,101 @@ export class Api<
         method: "GET",
         secure: true,
         format: "json",
+        ...params,
+      }),
+  };
+  educations = {
+    /**
+     * No description
+     *
+     * @tags Educations
+     * @name EducationsList
+     * @summary Get educations in your company.
+     * @request GET:/Educations
+     * @secure
+     * @response `200` `(Education)[]` If educations are found
+     * @response `401` `ProblemDetails` If unauthorized
+     * @response `403` `ProblemDetails` If user is missing required rights
+     * @response `404` `ProblemDetails` If no educations were found
+     */
+    educationsList: (params: RequestParams = {}) =>
+      this.request<Education[], ProblemDetails>({
+        path: `/Educations`,
+        method: "GET",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Educations
+     * @name EducationsCreate
+     * @summary Create an education in your company. Returns the id of the created education.
+     * @request POST:/Educations
+     * @secure
+     * @response `200` `string` If education were added
+     * @response `401` `ProblemDetails` If unauthorized
+     * @response `403` `ProblemDetails` If user is missing required rights
+     */
+    educationsCreate: (
+      data: CreateEducationRequestModel,
+      params: RequestParams = {},
+    ) =>
+      this.request<string, ProblemDetails>({
+        path: `/Educations`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Educations
+     * @name EducationsUpdate
+     * @summary Update an education in your company.
+     * @request PUT:/Educations/{educationId}
+     * @secure
+     * @response `200` `void` If education were updated
+     * @response `401` `ProblemDetails` If unauthorized
+     * @response `403` `ProblemDetails` If user is missing required rights
+     */
+    educationsUpdate: (
+      educationId: string,
+      data: UpdateEducationRequestModel,
+      params: RequestParams = {},
+    ) =>
+      this.request<void, ProblemDetails>({
+        path: `/Educations/${educationId}`,
+        method: "PUT",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Educations
+     * @name EducationsDelete
+     * @summary Delete an education in your company.
+     * @request DELETE:/Educations/{educationId}
+     * @secure
+     * @response `200` `void` If education were deleted
+     * @response `401` `ProblemDetails` If unauthorized
+     * @response `403` `ProblemDetails` If user is missing required rights
+     */
+    educationsDelete: (educationId: string, params: RequestParams = {}) =>
+      this.request<void, ProblemDetails>({
+        path: `/Educations/${educationId}`,
+        method: "DELETE",
+        secure: true,
         ...params,
       }),
   };
