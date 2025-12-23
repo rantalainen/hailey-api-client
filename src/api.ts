@@ -430,6 +430,12 @@ export interface Employee {
   customFieldsData?: Record<string, JToken>;
 }
 
+export interface EmployeeDocumentsFolderVm {
+  /** @format uuid */
+  folderId?: string;
+  name?: string | null;
+}
+
 /** A representation of an Employee in the list of Employees. More details on the Employee are included if the Employee is requested by Id. */
 export interface EmployeeListItem {
   /**
@@ -1527,6 +1533,20 @@ export class HttpClient<SecurityDataType = unknown> {
  * ### Certificates
  * In this endpoint, you will find a list of all certificates, including references to the holders, as well as the validity dates and status.
  *
+ * ### EmployeeDocuments
+ * Handles folders and documents for your company and employees.
+ *
+ * - **GET** /EmployeeDocuments/Folders
+ *   Fetch all folders in the company.
+ *   - **Access:** Controlled per folder. User needs **Specific Employee Access**: View, Edit, or Upload to see the folder.
+ *
+ * - **POST** /EmployeeDocuments/{employeeId}?folderId={folderId}
+ *   Upload a document for an employee.
+ *   - `folderId` (optional): Specify a folder; omit or null to upload to the root folder.
+ *   - **Supported file types:** `.jpg, .jpeg, .png, .pdf, .doc, .docx, .xls, .xlsx, .ppt, .pptx`
+ *   - **Maximum file size:** 30 MB
+ *   - **Access:** Controlled per folder. User needs **Specific Employee Access**: Edit or Upload to upload a document.
+ *
  * ## Webhooks
  * Companies have the option to configure webhooks in order to get notifications when data changes. Webhooks are sent when company data is modified or when a single employee is changed. The webhook URI is configured in the integrations section in Hailey.
  *
@@ -1965,6 +1985,70 @@ export class Api<
         body: data,
         secure: true,
         type: ContentType.Json,
+        ...params,
+      }),
+  };
+  employeeDocuments = {
+    /**
+     * No description
+     *
+     * @tags EmployeeDocuments
+     * @name FoldersList
+     * @summary Get list of folders in your company based on access.
+     * @request GET:/EmployeeDocuments/Folders
+     * @secure
+     * @response `200` `(EmployeeDocumentsFolderVm)[]` If call is successful
+     * @response `401` `ProblemDetails` If unauthorized
+     */
+    foldersList: (params: RequestParams = {}) =>
+      this.request<EmployeeDocumentsFolderVm[], ProblemDetails>({
+        path: `/EmployeeDocuments/Folders`,
+        method: "GET",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags EmployeeDocuments
+     * @name EmployeeDocumentsCreate
+     * @summary Upload a document to an employee's folder.
+     * @request POST:/EmployeeDocuments/{employeeId}
+     * @secure
+     * @response `200` `void` If document uploaded successfully.
+     * @response `400` `ProblemDetails` Bad Request
+     * @response `401` `ProblemDetails` If unauthorized.
+     * @response `403` `ProblemDetails` If User does not have access to the folder.
+     * @response `404` `ProblemDetails` If requested folder is not found
+     */
+    employeeDocumentsCreate: (
+      employeeId: string,
+      data: {
+        /**
+         * The file to upload. Allowed types: .jpg, .jpeg, .png, .pdf, .doc, .docx, .xls, .xlsx, .pptx, .ppt.
+         * Maximum size: 30 MB.
+         * @format binary
+         */
+        DocumentToUpload: File;
+      },
+      query?: {
+        /**
+         * Optional. The ID of the folder to place the document in. If omitted (null), the document will go to the root folder.
+         * @format uuid
+         */
+        folderId?: string;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<void, ProblemDetails>({
+        path: `/EmployeeDocuments/${employeeId}`,
+        method: "POST",
+        query: query,
+        body: data,
+        secure: true,
+        type: ContentType.FormData,
         ...params,
       }),
   };
