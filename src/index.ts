@@ -1,11 +1,9 @@
-import { Api, ApiConfig } from './api';
-import { AxiosRequestConfig } from 'axios';
 import { HttpsAgent } from 'agentkeepalive';
-import { HaileyApiClientConfig, HaileyApiClientOptions } from './interfaces';
-import { FileBuffer } from './file-buffer';
-import https from 'https';
+import { AxiosRequestConfig } from 'axios';
 import CacheableLookup from 'cacheable-lookup';
-import FormData from 'form-data';
+import https from 'https';
+import { Api, ApiConfig } from './api';
+import { HaileyApiClientConfig, HaileyApiClientOptions } from './interfaces';
 
 // DNS cache to prevent ENOTFOUND and other such issues
 const dnsCache = new CacheableLookup();
@@ -99,29 +97,6 @@ export class HaileyApiClient {
 class HaileyApiClientInstance extends Api<any> {
   constructor(config?: ApiConfig<any>) {
     super(config);
-  }
-
-  // Override createFormData because FormData needs to be imported manually
-  protected createFormData(input: Record<string, unknown>): any {
-    return Object.keys(input || {}).reduce((formData, key) => {
-      const property = input[key];
-      const propertyContent: any[] = property instanceof Array ? property : [property];
-
-      for (const formItem of propertyContent) {
-        const isFileType = formItem instanceof FileBuffer;
-
-        if (isFileType) {
-          formData.append(key, formItem.buffer, {
-            filename: formItem.name,
-            contentType: formItem.type
-          });
-        } else {
-          formData.append(key, this.stringifyFormItem(formItem));
-        }
-      }
-
-      return formData;
-    }, new FormData());
   }
 
   helpers = {};
