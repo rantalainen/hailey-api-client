@@ -51,6 +51,19 @@ export interface BankDetails {
   swift?: string | null;
 }
 
+/** A break within a reported day. */
+export interface Break {
+  /** The start time of the break (HH:mm[:ss]). */
+  from?: string | null;
+  /** The end time of the break (HH:mm[:ss]). */
+  to?: string | null;
+  /**
+   * Duration of the break in minutes.
+   * @format int32
+   */
+  breakTimeInMinutes?: number;
+}
+
 /** A BusinessArea created by the company. */
 export interface BusinessArea {
   /**
@@ -67,6 +80,39 @@ export interface BusinessArea {
   headOfBusinessAreaEmployeeId?: string | null;
   /** Departments belonging to this BusinessArea. */
   departmentsInBusinessArea?: DepartmentInBusinessArea[] | null;
+}
+
+/** A representation of a Casual Employment in the list of Casual Employments. */
+export interface CasualEmploymentListItem {
+  /**
+   * The unique Id of the Casual Employment in Hailey HR.
+   * @format uuid
+   */
+  employmentId?: string;
+  /**
+   * The unique Id of the Employee this Casual Employment belongs to in Hailey HR.
+   * @format uuid
+   */
+  employeeId?: string;
+  /**
+   * The start date of the Casual Employment in YYYY-MM-DD format.
+   * @format date
+   */
+  startDate?: string;
+  /**
+   * The end date of the Casual Employment in YYYY-MM-DD format.
+   * @format date
+   */
+  endDate?: string | null;
+  organizationalInformation?: EmploymentOrganizationalInformation;
+  /** Custom fields defined for a Company, with the data set for the Employment. */
+  customFieldsData?: Record<string, JToken>;
+  /** List of contracted periods within the Casual Employment. A contracted period is a period with contracted commitment of work with specific terms at a period that must be within the casual employment. */
+  contractedPeriods?: ContractedPeriodVm[] | null;
+  /** The Employment sequence number for the employment, auto generated or manually set. Multiple employments may have the same Employment sequence number. Note that this differs from the Employment number for the Employee. */
+  employmentSequenceNumber?: string | null;
+  /** The status of the employment. Can be "WillStart", "Active" or "Ended". */
+  status?: string | null;
 }
 
 export interface CasualEmploymentVm {
@@ -138,6 +184,8 @@ export interface Company {
   businessAreas?: BusinessArea[] | null;
   /** The Company's Cost Centers, if any. */
   costCenters?: CostCenter[] | null;
+  /** The Company's One-To-One Types, if any. */
+  oneToOneTypes?: OneToOneType[] | null;
 }
 
 /** A certification created by the company. */
@@ -198,6 +246,14 @@ export interface Compensation {
   bankDetails?: BankDetails;
 }
 
+export interface Competence {
+  /** @format uuid */
+  competenceId?: string;
+  name?: string | null;
+  description?: string | null;
+  for?: ForEmployeesWithOrganizationalBelonging;
+}
+
 /** Contact information for the Employee. */
 export interface ContactInformation {
   /** The Employee's private e-mail address. */
@@ -249,6 +305,16 @@ export interface ContractedPeriodVm {
    * @format uuid
    */
   substituteReasonId?: string | null;
+  /**
+   * The total number of hours the employee is contracted to work during the contracted period.
+   * @format double
+   */
+  contractedHours?: number | null;
+  /**
+   * The proportion of a full time employment the employee is contracted to work during the contracted period, expressed as a value between 0 and 1.
+   * @format double
+   */
+  contractedScope?: number | null;
 }
 
 /** A CostCenter created by the company. */
@@ -430,6 +496,15 @@ export interface Employee {
   customFieldsData?: Record<string, JToken>;
 }
 
+export interface EmployeeCompetence {
+  /** @format uuid */
+  competenceId?: string;
+  /** @format uuid */
+  employeeId?: string;
+  /** @format int32 */
+  rating?: number | null;
+}
+
 export interface EmployeeDocumentsFolderVm {
   /** @format uuid */
   folderId?: string;
@@ -608,6 +683,17 @@ export interface EmployeeListItem {
   employmentSequenceNumber?: string | null;
 }
 
+/** An employee with their reported time. */
+export interface EmployeeWithReportedTime {
+  /**
+   * The unique id of the employee in Hailey HR.
+   * @format uuid
+   */
+  employeeId?: string;
+  /** Reported time days for the employee. */
+  reportedTime?: ReportedDay[] | null;
+}
+
 /** An Employee with time off. */
 export interface EmployeeWithTimeOffs {
   /**
@@ -635,6 +721,48 @@ export interface Employment {
   employments?: EmploymentVm[] | null;
   /** A list of all Casual Employments for the employee. Includes current, past and future Casual Employments. Note that Casual employments has a different business logic from Employments, for details see our knowledge base. */
   casualEmployments?: CasualEmploymentVm[] | null;
+}
+
+/** A representation of an Employment in the list of Employments. */
+export interface EmploymentListItem {
+  /**
+   * The unique Id of the Employment in Hailey HR.
+   * @format uuid
+   */
+  employmentId?: string;
+  /**
+   * The unique Id of the Employee this Employment belongs to in Hailey HR.
+   * @format uuid
+   */
+  employeeId?: string;
+  /**
+   * A number representing the order of priority for this Employment among all Employments. This is e.g. useful for determining which Employment that should take priority when two employments have start and end date intervals that overlap. Highest priority is nr 1.
+   * @format int32
+   */
+  priority?: number;
+  /**
+   * The start date of the Employment in YYYY-MM-DD format.
+   * @format date
+   */
+  startDate?: string | null;
+  /**
+   * The end date of the Employment in YYYY-MM-DD format.
+   * @format date
+   */
+  endDate?: string | null;
+  /**
+   * The last working day of this employment, not necessarily the same date as last day of employment.
+   * @format date
+   */
+  lastWorkingDay?: string | null;
+  organizationalInformation?: EmploymentOrganizationalInformation;
+  terms?: EmploymentTerms;
+  /** Custom fields defined for a Company, with the data set for the Employment. */
+  customFieldsData?: Record<string, JToken>;
+  /** The Employment sequence number for the employment, auto generated or manually set. Multiple employments may have the same Employment sequence number. Note that this differs from the Employment number for the Employee. */
+  employmentSequenceNumber?: string | null;
+  /** The status of the employment. Can be "WillStart", "Active" or "Ended". */
+  status?: string | null;
 }
 
 export interface EmploymentOrganizationalInformation {
@@ -770,6 +898,11 @@ export interface EndBreakRequestModel {
   employeeId?: string;
 }
 
+export interface ExtendedPersonalAccessToken {
+  /** @format date-time */
+  expiration?: string;
+}
+
 /** A feedback for the Employee. */
 export interface Feedback {
   /**
@@ -782,6 +915,11 @@ export interface Feedback {
    * @format uuid
    */
   hostEmployeeId?: string;
+  /**
+   * Id of the one-to-one-type for the one-to-one.
+   * @format uuid
+   */
+  oneToOneTypeId?: string;
   /** Title set for the feedback. */
   title?: string | null;
   /** Date of the one-to-one. */
@@ -826,6 +964,11 @@ export interface FeedbackSession {
    * @format uuid
    */
   sessionHolderEmployeeId?: string;
+  /**
+   * Id of the one-to-one-type for the one-to-one.
+   * @format uuid
+   */
+  oneToOneTypeId?: string;
   /** Title set for the feedback session. */
   title?: string | null;
   /** Date of the feedback session. */
@@ -858,6 +1001,14 @@ export interface FeedbackSessionSection {
   questions?: FeedbackSessionQuestion[] | null;
 }
 
+export interface ForEmployeesWithOrganizationalBelonging {
+  locationIds?: string[] | null;
+  businessAreaIds?: string[] | null;
+  departmentIds?: string[] | null;
+  teamIds?: string[] | null;
+  titleIds?: string[] | null;
+}
+
 /** The Employee's emergency contact. */
 export interface Ice {
   /** Name of the Employee's emergency contact. */
@@ -874,6 +1025,39 @@ export interface ImportEmploymentTimeOffs {
   /** @format uuid */
   employmentId?: string;
   timeOffs?: ImportTimeOffDate[] | null;
+}
+
+/** A representation of a finalized One-To-One */
+export interface ImportOneToOneRequestModel {
+  /**
+   * Id of the employee the one-to-one is about.
+   * @format uuid
+   */
+  employeeId: string;
+  /**
+   * Id of the other participant in the one-to-one
+   * @format uuid
+   */
+  colleagueEmployeeId?: string;
+  /**
+   * Id of the one-to-one type this one-to-one belongs to.
+   * @format uuid
+   */
+  oneToOneTypeId?: string;
+  /**
+   * Title of the one-to-one.
+   * @minLength 1
+   */
+  title: string;
+  /**
+   * Date the one-to-one meeting took place.
+   * @format date
+   */
+  meetingDate: string;
+  /** Free-text notes for the one-to-one. */
+  notes?: string | null;
+  /** Sections of questions covered in the one-to-one. */
+  sections?: OneToOneSection[] | null;
 }
 
 export interface ImportTimeOffDate {
@@ -893,7 +1077,24 @@ export interface ImportTimeOffDate {
 }
 
 export interface ImportTimeOffRequestModel {
-  employmentTimeOffs?: ImportEmploymentTimeOffs[] | null;
+  employmentTimeOffs: ImportEmploymentTimeOffs[];
+}
+
+export interface InitiateHiringRequestModel {
+  /** @minLength 1 */
+  candidateFirstName: string;
+  /** @minLength 1 */
+  candidateLastName: string;
+  /**
+   * @format email
+   * @minLength 1
+   */
+  candidatePrivateEmail: string;
+  /**
+   * @format email
+   * @minLength 1
+   */
+  companyEmail: string;
 }
 
 export type JToken = JToken[];
@@ -938,12 +1139,32 @@ export interface JobAd {
   careerPageId?: string | null;
   /** Value that explain if the location of the job should be shown in the Job ad. */
   showLocation?: boolean;
+  /**
+   * The unique Id in Hailey Hr for the location connected to the recruitment
+   * @format uuid
+   */
+  locationId?: string | null;
   /** Value that explain if the department of the job should be shown in the Job ad. */
   showDepartment?: boolean;
+  /**
+   * The unique Id in Hailey Hr for the department connected to the recruitment
+   * @format uuid
+   */
+  departmentId?: string | null;
   /** The Job ad's custom input fields, if any. */
   customInputFields?: CustomInputField[] | null;
   /** A link to the published Job ad on the Career Page, if any. */
   linkToJobAdOnCareerPage?: string | null;
+  /**
+   * The date from which we will publish the job ad on the chosen career page
+   * @format date
+   */
+  publishedFrom?: string | null;
+  /**
+   * The date on which we will unpublish the job ad on the chosen career page
+   * @format date
+   */
+  publishedTo?: string | null;
 }
 
 /** Job related data for the Employee. */
@@ -1008,6 +1229,46 @@ export interface Location {
   phone?: string | null;
 }
 
+export interface OneToOneQuestion {
+  /**
+   * Text of the question.
+   * @minLength 1
+   */
+  question: string;
+  /**
+   * Type of answer expected for the question. Valid values: Text, SingleSelect, RangeOneToThree, RangeOneToFive, RangeOneToTen.
+   * @minLength 1
+   */
+  answerType: string;
+  /** Answer given by the employee before the one-to-one meeting. */
+  answerBeforeByEmployee?: string | null;
+  /** Answer given by the colleague before the one-to-one meeting. */
+  answerBeforeByColleague?: string | null;
+  /** Answer given during the one-to-one meeting itself. */
+  answerDuringOneToOne?: string | null;
+}
+
+export interface OneToOneSection {
+  /**
+   * Title of the section.
+   * @minLength 1
+   */
+  title: string;
+  /** Questions belonging to this section. */
+  questions?: OneToOneQuestion[] | null;
+}
+
+/** A one-to-one type created by the company. */
+export interface OneToOneType {
+  /**
+   * The unique id for the one-to-one type in Hailey HR.
+   * @format uuid
+   */
+  oneToOneTypeId?: string;
+  /** The name of the one-to-one type. */
+  name?: string | null;
+}
+
 /** Personal data for the Employee. */
 export interface Personal {
   /** General personal information. */
@@ -1058,6 +1319,26 @@ export interface PublicEmployeeListItem {
   workPhone?: string | null;
 }
 
+/** A reported time day for an employee. */
+export interface ReportedDay {
+  /**
+   * The date of the reported time.
+   * @format date
+   */
+  date?: string;
+  /** Worked time entries for the day. */
+  workedTime?: WorkedTime[] | null;
+  /** Breaks registered for the day. */
+  breaks?: Break[] | null;
+  /** The approval status of the reported day. */
+  status?: string | null;
+  /**
+   * Total worked time for the day in minutes, with breaks deducted.
+   * @format int32
+   */
+  totalWorkedTimeInMinutes?: number;
+}
+
 /** A Salary for the Employee. */
 export interface Salary {
   /**
@@ -1100,6 +1381,8 @@ export interface Salary {
   pendingAmountApproval?: SalaryAmountPendingApproval;
   /** Information about a proposed end of salary that has not yet been approved. */
   pendingEndApproval?: SalaryEndPendingApproval;
+  /** Information about a pending salary reactivation request that has not yet been approved. */
+  pendingReactivationApproval?: SalaryReactivationPendingApproval;
 }
 
 /** Information about a proposed change in a Salary amount that has not yet been approved. */
@@ -1165,6 +1448,15 @@ export interface SalaryPendingApproval {
   amount?: number;
 }
 
+/** Information about a pending salary reactivation request that has not yet been approved. */
+export interface SalaryReactivationPendingApproval {
+  /**
+   * The id for the employee that requested the reactivation.
+   * @format uuid
+   */
+  requestedByEmployeeId?: string;
+}
+
 /** Personal information considered sensitive. */
 export interface Sensitive {
   /** The Employee's gender, e.g. female, male or other. */
@@ -1221,6 +1513,14 @@ export interface ThreeSixtySection {
   questions?: ThreeSixtyQuestion[] | null;
 }
 
+/** All time registered for a company. */
+export interface Time {
+  /** Time settings for the company. */
+  timeAndTimeOffSettings?: TimeSettings;
+  /** A list of the Company's Employees with time. */
+  employees?: EmployeeWithReportedTime[] | null;
+}
+
 /** The Time and Time off settings of the company */
 export interface TimeAndTimeOffSettings {
   timeOffReasons?: TimeOffReason[] | null;
@@ -1254,7 +1554,12 @@ export interface TimeOffDate {
   /** A bool indicating if the time off has been approved by someone according to the approval principles for the company. */
   isApproved?: boolean;
   /**
-   * The Id for the Time off reason. More details for the Time off reason can be found in the settings property.
+   * The date on which the time off was approved
+   * @format date
+   */
+  approvalDate?: string | null;
+  /**
+   * The ID for the Time off reason. More details for the Time off reason can be found in the settings property.
    * @format uuid
    */
   timeOffReasonId?: string | null;
@@ -1266,6 +1571,23 @@ export interface TimeOffReason {
   timeOffReasonId?: string;
   reason?: string | null;
   timeOffCategory?: string | null;
+}
+
+/** A time project configured for the company. */
+export interface TimeProject {
+  /**
+   * The unique id of the time project.
+   * @format uuid
+   */
+  timeProjectId?: string;
+  /** The name of the time project. */
+  name?: string | null;
+}
+
+/** Time settings for the company. */
+export interface TimeSettings {
+  /** Time projects configured for the company. */
+  timeProjects?: TimeProject[] | null;
 }
 
 /** A title created by the company. */
@@ -1285,12 +1607,30 @@ export interface UpdateCompanyEmailRequestModel {
 }
 
 export interface UpdateCustomEmployeeFieldsRequestModel {
-  customFieldsData?: Record<string, JToken>;
+  customFieldsData: Record<string, JToken>;
 }
 
 export interface UpdateEducationRequestModel {
   educationName?: string | null;
   description?: string | null;
+}
+
+/** A worked time entry within a reported day. */
+export interface WorkedTime {
+  /** The start time of the worked period (HH:mm[:ss]). */
+  from?: string | null;
+  /** The end time of the worked period (HH:mm[:ss]). */
+  to?: string | null;
+  /**
+   * The time project this worked time is registered on. Null if no project.
+   * @format uuid
+   */
+  timeProjectId?: string | null;
+  /**
+   * Duration of this worked time entry in minutes.
+   * @format int32
+   */
+  workedTimeInMinutes?: number;
 }
 
 import type {
@@ -1479,6 +1819,9 @@ export class HttpClient<SecurityDataType = unknown> {
  *
  * To use Hailey's API, you need a Hailey account and permissions to create personal access tokens. What you can do with the API depends on what level of access your user has to the master data.
  *
+ * ### Extend personal access token
+ * Personal access tokens are valid for one year. Use this endpoint before your token expires to extend it to one year from now. The token itself stays the same, so your integration keeps working without changes. Extending needs the same permission as creating a personal access token.
+ *
  * ### Company data
  * Here you can fetch basic information regarding your company, including name of e.g. departments, teams and custom fields.
  *
@@ -1497,6 +1840,9 @@ export class HttpClient<SecurityDataType = unknown> {
  * ### Employee data
  * Employee data is provided in two endpoints, one to fetch a list of all employees with basic info, and one to fetch detailed info for a single employee.
  *
+ * ### Import One to one
+ * Use this endpoint to import a finalized one-to-one for an employee, including its sections, questions and answers.
+ *
  * ### Import Time off
  * Importing time off data is imported to the Hailey calendar. Note that all imported dates are assumed to be approved.  The Endpoint should take multiple employees with multiple time off dates.
  *
@@ -1508,6 +1854,9 @@ export class HttpClient<SecurityDataType = unknown> {
  *
  * ### Time off
  * Use this endpoint to fetch time off for all employees in your company. Add from/to query parameters to filter by date. Both requested and approved time off is included.
+ *
+ * ### Time
+ * Use this endpoint to fetch time for all employees in your company. Add from/to query parameters to filter by date. Both requested and approved time is included.
  *
  * ### Clock In
  * Use this endpoint to clock in a certain employee to starting recording worked time.
@@ -1532,6 +1881,12 @@ export class HttpClient<SecurityDataType = unknown> {
  *
  * ### Certificates
  * In this endpoint, you will find a list of all certificates, including references to the holders, as well as the validity dates and status.
+ *
+ * ### Employments
+ * Use this endpoint to fetch all employments for all employees in your company, or a single employment by employmentId. Note that an employee can have multiple employments, and the priority field indicates which employment takes precedence when intervals overlap.
+ *
+ * ### Casual Employments
+ * Use this endpoint to fetch all casual employments for all employees in your company, or a single casual employment by employmentId. Note that an employee can have multiple casual employments.
  *
  * ### EmployeeDocuments
  * Handles folders and documents for your company and employees.
@@ -1602,6 +1957,51 @@ export class Api<
         body: data,
         secure: true,
         type: ContentType.Json,
+        ...params,
+      }),
+  };
+  casualEmployments = {
+    /**
+     * No description
+     *
+     * @tags CasualEmployments
+     * @name CasualEmploymentsList
+     * @summary Get a list of all Casual Employments in your Company.
+     * @request GET:/CasualEmployments
+     * @secure
+     * @response `200` `(CasualEmploymentListItem)[]` If Casual Employments are found
+     * @response `401` `ProblemDetails` If unauthorized
+     */
+    casualEmploymentsList: (params: RequestParams = {}) =>
+      this.request<CasualEmploymentListItem[], ProblemDetails>({
+        path: `/CasualEmployments`,
+        method: "GET",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags CasualEmployments
+     * @name CasualEmploymentsDetail
+     * @summary Get a single Casual Employment in your Company by the Id of the Employment.
+     * @request GET:/CasualEmployments/{employmentId}
+     * @secure
+     * @response `200` `CasualEmploymentListItem` If Casual Employment is found
+     * @response `401` `ProblemDetails` If unauthorized
+     * @response `404` `ProblemDetails` If Casual Employment is not found
+     */
+    casualEmploymentsDetail: (
+      employmentId: string,
+      params: RequestParams = {},
+    ) =>
+      this.request<CasualEmploymentListItem, ProblemDetails>({
+        path: `/CasualEmployments/${employmentId}`,
+        method: "GET",
+        secure: true,
+        format: "json",
         ...params,
       }),
   };
@@ -1753,6 +2153,48 @@ export class Api<
     salaryTypesList: (params: RequestParams = {}) =>
       this.request<CompanySalaryType[], ProblemDetails>({
         path: `/Company/SalaryTypes`,
+        method: "GET",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+  };
+  competences = {
+    /**
+     * No description
+     *
+     * @tags Competences
+     * @name CompetencesList
+     * @summary Get all competences.
+     * @request GET:/Competences
+     * @secure
+     * @response `200` `(Competence)[]` If call is successful
+     * @response `401` `void` If unauthorized
+     * @response `403` `ProblemDetails` If user is missing required rights
+     */
+    competencesList: (params: RequestParams = {}) =>
+      this.request<Competence[], void | ProblemDetails>({
+        path: `/Competences`,
+        method: "GET",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Competences
+     * @name EmployeesList
+     * @summary Get all employees competences.
+     * @request GET:/Competences/Employees
+     * @secure
+     * @response `200` `(EmployeeCompetence)[]` If call is successful
+     * @response `401` `void` If unauthorized
+     */
+    employeesList: (params: RequestParams = {}) =>
+      this.request<EmployeeCompetence[], void>({
+        path: `/Competences/Employees`,
         method: "GET",
         secure: true,
         format: "json",
@@ -2095,6 +2537,76 @@ export class Api<
         ...params,
       }),
   };
+  employments = {
+    /**
+     * No description
+     *
+     * @tags Employments
+     * @name EmploymentsList
+     * @summary Get a list of all Employments in your Company.
+     * @request GET:/Employments
+     * @secure
+     * @response `200` `(EmploymentListItem)[]` If employments are found
+     * @response `401` `ProblemDetails` If unauthorized
+     * @response `404` `ProblemDetails` Not Found
+     */
+    employmentsList: (params: RequestParams = {}) =>
+      this.request<EmploymentListItem[], ProblemDetails>({
+        path: `/Employments`,
+        method: "GET",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Employments
+     * @name EmploymentsDetail
+     * @summary Fetch a single Employment in your company by the Id of the Employment.
+     * @request GET:/Employments/{employmentId}
+     * @secure
+     * @response `200` `EmploymentListItem` If Employment is found
+     * @response `401` `ProblemDetails` If unauthorized
+     * @response `404` `ProblemDetails` If Employment is not found
+     */
+    employmentsDetail: (employmentId: string, params: RequestParams = {}) =>
+      this.request<EmploymentListItem, ProblemDetails>({
+        path: `/Employments/${employmentId}`,
+        method: "GET",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+  };
+  importOneToOne = {
+    /**
+     * No description
+     *
+     * @tags ImportOneToOne
+     * @name ImportOneToOneCreate
+     * @summary Post a Finalized One-To-One.
+     * @request POST:/ImportOneToOne
+     * @secure
+     * @response `200` `void` If import is successful
+     * @response `400` `ProblemDetails` If request is invalid
+     * @response `401` `ProblemDetails` If unauthorized
+     * @response `403` `ProblemDetails` If access denied
+     */
+    importOneToOneCreate: (
+      data: ImportOneToOneRequestModel,
+      params: RequestParams = {},
+    ) =>
+      this.request<void, ProblemDetails>({
+        path: `/ImportOneToOne`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        ...params,
+      }),
+  };
   importTimeOff = {
     /**
      * No description
@@ -2104,9 +2616,10 @@ export class Api<
      * @summary Import time off from third party program to Hailey.
      * @request POST:/ImportTimeOff
      * @secure
-     * @response `201` `void` Created
-     * @response `400` `ProblemDetails` Bad Request
-     * @response `default` `ProblemDetails` Error
+     * @response `200` `void` If time off imported
+     * @response `400` `ProblemDetails` If import contains no time off
+     * @response `401` `ProblemDetails` If unauthorized
+     * @response `403` `ProblemDetails` If access denied
      */
     importTimeOffCreate: (
       data: ImportTimeOffRequestModel,
@@ -2114,6 +2627,34 @@ export class Api<
     ) =>
       this.request<void, ProblemDetails>({
         path: `/ImportTimeOff`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        ...params,
+      }),
+  };
+  initiateHiring = {
+    /**
+ * No description
+ *
+ * @tags InitiateHiring
+ * @name InitiateHiringCreate
+ * @summary Import a candidate from a third party recruitment program to Hailey to start a hiring process.
+A task will be created for the employee matching the company email.
+ * @request POST:/InitiateHiring
+ * @secure
+ * @response `200` `void` If candidate imported
+ * @response `401` `ProblemDetails` If unauthorized
+ * @response `403` `ProblemDetails` If access denied
+ * @response `404` `ProblemDetails` If no company email matches
+ */
+    initiateHiringCreate: (
+      data: InitiateHiringRequestModel,
+      params: RequestParams = {},
+    ) =>
+      this.request<void, ProblemDetails>({
+        path: `/InitiateHiring`,
         method: "POST",
         body: data,
         secure: true,
@@ -2139,6 +2680,28 @@ export class Api<
       this.request<JobAd[], ProblemDetails>({
         path: `/JobAd`,
         method: "GET",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+  };
+  personalAccessToken = {
+    /**
+     * No description
+     *
+     * @tags PersonalAccessToken
+     * @name ExtendCreate
+     * @summary Extends the personal access token you call with, so it expires one year from now. The token itself stays the same.
+     * @request POST:/PersonalAccessToken/Extend
+     * @secure
+     * @response `200` `ExtendedPersonalAccessToken` If the token is extended
+     * @response `401` `ProblemDetails` If unauthorized
+     * @response `403` `ProblemDetails` If you don't have the permission to create personal access tokens
+     */
+    extendCreate: (params: RequestParams = {}) =>
+      this.request<ExtendedPersonalAccessToken, ProblemDetails>({
+        path: `/PersonalAccessToken/Extend`,
+        method: "POST",
         secure: true,
         format: "json",
         ...params,
@@ -2209,6 +2772,37 @@ export class Api<
     ) =>
       this.request<Salary, ProblemDetails>({
         path: `/Salary`,
+        method: "GET",
+        query: query,
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+  };
+  time = {
+    /**
+     * No description
+     *
+     * @tags Time
+     * @name TimeList
+     * @summary Get reported time for your company. Defaults to the current month if no date range is provided.
+     * @request GET:/Time
+     * @secure
+     * @response `200` `Time` Reported time found
+     * @response `400` `ProblemDetails` If from date is after to date
+     * @response `401` `void` Unauthorized
+     */
+    timeList: (
+      query?: {
+        /** @format date */
+        from?: string;
+        /** @format date */
+        to?: string;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<Time, ProblemDetails | void>({
+        path: `/Time`,
         method: "GET",
         query: query,
         secure: true,
